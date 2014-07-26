@@ -117,13 +117,13 @@ class FieldGenerator {
 			} elseif ($type == 'dateTime') {
 				if ($name == 'deleted_at' and $nullable) {
 					$nullable = false;
-					$type = 'softDeletes';
+					$type = 'integer';
 					$name = '';
 				} elseif ($name == 'created_at' and isset($fields['updated_at'])) {
-					$fields['updated_at'] = ['field' => '', 'type' => 'timestamps'];
+					$fields['updated_at'] = ['field' => '', 'type' => 'integer'];
 					continue;
 				} elseif ($name == 'updated_at' and isset($fields['created_at'])) {
-					$fields['created_at'] = ['field' => '', 'type' => 'timestamps'];
+					$fields['created_at'] = ['field' => '', 'type' => 'integer'];
 					continue;
 				}
 			} elseif (in_array($type, ['decimal', 'float', 'double'])) {
@@ -143,6 +143,10 @@ class FieldGenerator {
 			if ($nullable) $decorators[] = 'nullable';
 			if ($default !== null) $decorators[] = $this->getDefault($default, $type);
 			if ($index) $decorators[] = $this->decorate($index->type, $index->name, true);
+
+            $comment = $column->getComment();
+
+            if ($comment) $decorators[] = $this->decorate('comment', $column->getComment());
 
 			$field = ['field' => $name, 'type' => $type];
 			if ($decorators) $field['decorators'] = $decorators;
